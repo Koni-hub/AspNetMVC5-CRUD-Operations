@@ -1,0 +1,66 @@
+﻿@model WebApplication2.Models.Product
+
+
+<a href="@Url.Action("Index")" class="btn btn-default">
+    <i class="fa-solid fa-arrow-left"></i> Back to List
+</a>
+<hr />
+<h2>Edit</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        @Html.HiddenFor(model => model.ProductID)
+        @Html.LabelFor(model => model.ProductName)
+        @Html.EditorFor(model => model.ProductName, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Brand)
+        @Html.EditorFor(model => model.Brand, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(model => model.Brand, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Price)
+        @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3" id="edit-btn">Save Changes</button>
+}
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        $(document).ready(function () {
+            $('#edit-btn').on('click', function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Do you want to edit this product?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, edit it!',
+                    cancelButtonText: 'No, cancel!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('form').submit();
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        Swal.fire(
+                            'Cancelled',
+                            'Your product edit has been cancelled.',
+                            'error'
+                        );
+                    }
+                });
+            });
+        });
+    </script>
+}

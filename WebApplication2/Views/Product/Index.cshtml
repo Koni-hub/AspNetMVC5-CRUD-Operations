@@ -1,0 +1,103 @@
+﻿@model List<WebApplication2.Models.Product>
+
+<h2>Products List</h2>
+
+<div class="btn btn-primary mb-3">
+    <a href="@Url.Action("Create")" class="link-light text-decoration-none">Add New Product</a>
+</div>
+
+<table class="table table-striped table align-middle">
+    <thead>
+        <tr>
+            <th scope="col" class="text-center">Name</th>
+            <th scope="col" class="text-center">Brand</th>
+            <th scope="col" class="text-center">Price</th>
+            <th scope="col" class="text-center">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.ProductName)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.Brand)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.Price)</td>
+                <td class="text-center">
+                    <a href="@Url.Action("Edit", new { id = item.ProductID })" class="btn btn-primary btn-sm" title="Edit">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+
+                    <a href="@Url.Action("Delete", new { id = item.ProductID })" class="btn btn-danger btn-sm delete-product" title="Delete" data-product-id="@item.ProductID">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </a>
+
+                    <a href="@Url.Action("Details", new { id = item.ProductID })" class="btn btn-info btn-sm text-light" title="Details">
+                        <i class="fas fa-info-circle"></i> Details
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        $(document).ready(function () {
+            $('.delete-product').on('click', function (e) {
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+                var deleteUrl = '@Url.Action("DeleteConfirmed", "Product")';
+
+                console.log('Delete URL:', deleteUrl);
+                console.log('Product ID:', productId);
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to delete this item?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: deleteUrl,
+                            type: 'POST',
+                            data: {
+                                id: productId
+                            },
+                            success: function(response) {
+                                console.log('Server response:', response);
+                                if (response.success) {
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'Your item has been deleted.',
+                                        'success'
+                                    ).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        response.message,
+                                        'error'
+                                    );
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.log('AJAX error:', xhr, status, error);
+                                Swal.fire(
+                                    'Error!',
+                                    'There was an error deleting the product.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
